@@ -6,6 +6,8 @@ service_account_key.json
 token.json
 credentials.json
 
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -117,6 +119,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+confs.py
+cred_conf.py
 
 # Spyder project settings
 .spyderproject

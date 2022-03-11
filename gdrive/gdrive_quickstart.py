@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 # https://developers.google.com/drive/api/v3/about-auth
 SCOPES = ['https://www.googleapis.com/auth/drive.file',
-        'https://mail.google.com/'
+        # 'https://mail.google.com/'
         # 'https://www.googleapis.com/auth/drive.appdata'
         ]
 

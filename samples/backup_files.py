@@ -16,7 +16,7 @@ from confs import PATH_BACKUP_RAGIC_FOLDER, PATH_BACKUP_RAGIC_MEDIA_FOLDER, PATH
 
 from glob import glob, iglob
 from io import StringIO, BytesIO
-from gdrive_util import upload_files_to_gdrive_folder
+from gdrive.gdrive_util import upload_files_to_gdrive_folder
 
 from backup_ragic import backup_ragic
 
