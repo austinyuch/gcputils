@@ -1,0 +1,17 @@
+#改用poetry維護, 因為目前deploy在repl.it, 而repl.it用得是poetry, 這樣的一致性可以減少錯誤
+# fastapi>=0.63
+uvicorn>=0.13.4
+pandas>=1.2.3
+aiohttp>=3.7.4
+aiofiles
+poetry
+lxml
+# pydrive
+# fastapi security
+
+# drive api v3
+google-api-python-client 
+google-auth-httplib2 
+google-auth-oauthlib
+
+# python3 -m poetry add jose passlib

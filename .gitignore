@@ -1,3 +1,11 @@
+
+#google drive api
+client_secrets.json
+client_secret*.json
+service_account_key.json
+token.json
+credentials.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,3 +135,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# lock files
+poetry.lock
+
