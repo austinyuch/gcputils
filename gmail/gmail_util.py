@@ -63,11 +63,12 @@ https://github.com/qualman/gmail_delete_by_filter/blob/master/deleter.py
 # coding: utf-8
 
 
-
+import json
 import requests
 import base64
-from confs import dic_query
+from confs import DIC_QUERY, SCOPES, TOKEN_FILE_LOCATION, KEY_FILE_LOCATION
 from cred_conf import apikey
+from google_client_api_util import google_client_api_creds, google_client_api_service
 
 # token='ya29.a0AfH6SMCa0aRk0P_....
 # url='https://gmail.googleapis.com/gmail/v1/users/me/messages?q=from%3Aabcd%40gmail.com'
@@ -78,36 +79,36 @@ LST_QUERY = ["from:joyboy@gmail.com",
     "newer_than:1d"]
 
 def convert_query_list_str(
-                        lst_query:list=LST_QUERY
-                    )->str:
-    """
-    
-    """
-    str_query = ""
-    for i in lst_query:
-        str_query += i + " "
-    
-    str_query=str_query.rstrip()
+                      lst_query:list=LST_QUERY
+                  )->str:
+  """
+  
+  """
+  str_query = ""
+  for i in lst_query:
+      str_query += i + " "
+  
+  str_query=str_query.rstrip()
 
-    return str_query
+  return str_query
 
 def get_api_url_from_query(str_query:dict, 
-                            str_userid:str="me",
-                            # use_apikey:bool=True
-                            )->str:
-    """
-    Return API URL from query string
-    dic_query:dict
-    {
+                          str_userid:str="me",
+                          # use_apikey:bool=True
+                          )->str:
+  """
+  Return API URL from query string
+  dic_query:dict
+  {
 
-    }
-    """
-    str_url = f"{API_URL_BASE}{str_userid}/messages?q={str_query}"
-    # str_query=""
-    # if use_apikey:
-    #     str_url += f"&key={apikey}"
+  }
+  """
+  str_url = f"{API_URL_BASE}{str_userid}/messages?q={str_query}"
+  # str_query=""
+  # if use_apikey:
+  #     str_url += f"&key={apikey}"
 
-    return str_url
+  return str_url
 
 
 
@@ -131,29 +132,67 @@ def get_header(
 #Email list from url generated from search query
 # def list_emails(token,url):
 def list_emails(str_url:str, 
-                # use_apikey:bool=True,
-                token:str=None
-            ):
-    dic_headers = get_header(token)
+              # use_apikey:bool=True,
+              token:str=None
+          )->list:
+  dic_headers = get_header(token)
 
-    r=requests.get(str_url, headers=dic_headers)
+  r=requests.get(str_url, headers=dic_headers)
 
-    id_list=[]
+  lst_id=[]
+  if r.json()['resultSizeEstimate'] > 0:
     for i in r.json().get('messages'):
-        id_list.append(i.get('id'))
+        lst_id.append(i.get('id'))
 
-    return id_list
+  return lst_id
     
 
 #Delete Email list from abcd@gmail.com
-def delete_emails(r,use_apikey:bool=True,token=None):
-    dic_headers = get_header(use_apikey,token)
+def delete_emails(r,
+              userid,
+              use_apikey:bool=True,
+              token=None):
 
-    payload="""{}""".format({"ids":r})
-    m=requests.post('https://gmail.googleapis.com/gmail/v1/users/me/messages/batchDelete', 
-                    headers=dic_headers,
-                    data=payload
-                )
+  dic_headers = get_header(token)
+  str_url = f"https://gmail.googleapis.com/gmail/v1/users/{userid}/messages/batchDelete"
+  # 'https://gmail.googleapis.com/gmail/v1/users/me/messages/batchDelete'
+  payload="""{}""".format({"ids":r})
+  try:
+    m=requests.post(str_url, 
+                  headers=dic_headers,
+                  data=payload
+              )
+    print(m.json())
+
+  except Exception as e:
+    print(e)
+
+def get_token()->str:
+  # 更新token
+  creds = google_client_api_creds(SCOPES, 
+                            str(KEY_FILE_LOCATION), 
+                            str(TOKEN_FILE_LOCATION)
+                          )
+  # 讀入token
+  dic_token = {}    
+  with open(str(TOKEN_FILE_LOCATION), 'r') as f:
+      dic_token = json.load(f)
+
+  str_token = dic_token["token"]
+  return str_token
+
+def main():
+  str_token = get_token()
+  for key, lst_query in DIC_QUERY.items():
+    str_query = convert_query_list_str(lst_query)
+    str_url = get_api_url_from_query(str_query)
+    lst_r = list_emails(str_url, str_token)
+    print(lst_r)
+    if len(lst_r) > 0:
+      try:
+        delete_emails(lst_r, "me", token=str_token)
+      except Exception as e:
+        print(e)
 
 
 # while True:
@@ -165,10 +204,14 @@ def delete_emails(r,use_apikey:bool=True,token=None):
 #         break
 
 if __name__ == '__main__':
+    main()
     # print(list_emails(token,url))
     # print(get_api_url_from_query(dic_query))
-    str_query = convert_query_list_str(lst_query=dic_query["asuswebstorage"])
-    print(str_query)
-    str_url = get_api_url_from_query(str_query)
-    print(str_url)
-    list_emails(str_url)
+    # str_token=get_token()
+    # print(str_token)
+    # str_query = convert_query_list_str(lst_query=DIC_QUERY["asuswebstorage"])
+    # print(str_query)
+    # str_url = get_api_url_from_query(str_query)
+    # print(str_url)
+    # lst_id=list_emails(str_url, str_token)
+    # print(lst_id)
