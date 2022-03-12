@@ -2,8 +2,9 @@
 from pathlib import Path
 # 要搜尋的gmail郵件條件
 # ref: https://support.google.com/mail/answer/7190
+REFRESH_SLEEP_SECONDS = 120
 
-dic_query = {
+DIC_QUERY = {
     "joyboy@gmail.com":[ #條件名稱, 方便自己維護
         "from:joyboy@gmail.com",
         "subject:(晚餐 電影 錢)"
